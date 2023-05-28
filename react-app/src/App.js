@@ -38,6 +38,7 @@ const findMetaMaskAccount = async () => {
 function App() {
 
   const [currentAccount, setCurrentAccount] = useState("");
+  const [userMessage, setUserMessage] = useState("");
   const [allWaves, setAllWaves] = useState([]);
   const contractAddress = '0xa7b79E516C2B0778Ce0D8d34d462Bb6aA67F5fdF'
   const contractABI = abi.abi
@@ -56,7 +57,7 @@ function App() {
   const getAllWaves = async () => {
     try {
       const { ethereum } = window;
-      if(ethereum) {
+      if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer)
@@ -102,7 +103,8 @@ function App() {
     }
   }
 
-  const wave = async () => {
+  const wave = async (e) => {
+    e.preventDefault()
     try {
       const { ethereum } = window;
 
@@ -116,7 +118,7 @@ function App() {
 
         //execute actual wave
 
-        const waveTxn = await wavePortalContract.wave("HARDCODE")
+        const waveTxn = await wavePortalContract.wave(String(userMessage), { gasLimit: 300000 })
         console.log("Mining...", waveTxn.hash)
 
         await waveTxn.wait()
@@ -125,11 +127,11 @@ function App() {
         count = await wavePortalContract.getTotalWaves()
         console.log("total wave count...", count.toNumber())
         getAllWaves()
-        
+
       } else {
         console.log('ethereum object does not exist on window')
       }
-    }catch (error) {
+    } catch (error) {
       console.log(error)
     }
   }
@@ -143,8 +145,13 @@ function App() {
         <div className="bio">
           Connect your ethereum wallet and wave at me! {currentAccount}
         </div>
-        <button className="waveButton" onClick={wave}>Wave at me</button>
-        <button className="waveButton" onClick={connectWallet}>{currentAccount ? 'Wallet Connected!': 'Connect Wallet'}</button>
+
+        <form className="form-wrapper" onSubmit={wave}>
+          <textarea value={userMessage} onChange={(e) => setUserMessage(e.target.value)} placeholder="Enter message:" />
+          <button className="waveButton" type="submit">Wave at me</button>
+        </form>
+
+        <button className="waveButton" onClick={connectWallet}>{currentAccount ? 'Wallet Connected!' : 'Connect Wallet'}</button>
 
         {allWaves.map((wave, index) => {
           return (
