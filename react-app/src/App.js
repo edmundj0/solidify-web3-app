@@ -80,6 +80,17 @@ function App() {
 
         let count = await wavePortalContract.getTotalWaves()
         console.log("total wave count: ", count.toNumber())
+
+        //execute actual wave
+
+        const waveTxn = await wavePortalContract.wave()
+        console.log("Mining...", waveTxn.hash)
+
+        await waveTxn.wait()
+        console.log("Mined --", waveTxn.hash)
+
+        count = await wavePortalContract.getTotalWaves()
+        console.log("total wave count...", count.toNumber())
       } else {
         console.log('ethereum object does not exist on window')
       }
