@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
 import abi from "./utils/WavePortal.json"
-import { ethers } from "hardhat";
+import { ethers } from "ethers";
 
 const getEthereumObject = () => window.ethereum; //metamask injects this in browser
 
@@ -97,7 +97,7 @@ function App() {
         <div className="bio">
           Connect your ethereum wallet and wave at me! {currentAccount}
         </div>
-        <button className="waveButton" onClick={null}>Wave at me</button>
+        <button className="waveButton" onClick={wave}>Wave at me</button>
         <button className="waveButton" onClick={connectWallet}>{currentAccount ? 'Wallet Connected!': 'Connect Wallet'}</button>
       </div>
 
