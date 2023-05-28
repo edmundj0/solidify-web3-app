@@ -33,10 +33,13 @@ const findMetaMaskAccount = async () => {
 
 }
 
+
+
 function App() {
 
   const [currentAccount, setCurrentAccount] = useState("");
-  const contractAddress = '0xB9a9f4f998d0Aaceb0b18F6666edBB8E73598c42'
+  const [allWaves, setAllWaves] = useState([]);
+  const contractAddress = '0xa7b79E516C2B0778Ce0D8d34d462Bb6aA67F5fdF'
   const contractABI = abi.abi
 
   useEffect(() => {
@@ -44,10 +47,40 @@ function App() {
       const account = await findMetaMaskAccount();
       if (account !== null) {
         setCurrentAccount(account);
+        getAllWaves()
       }
     }
     getAccount()
   }, []);
+
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window;
+      if(ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer)
+
+        //call method from smart contract
+        const waves = await wavePortalContract.getAllWaves()
+
+        let wavesCleaned = []
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          })
+        })
+        setAllWaves(wavesCleaned)
+      }
+      else {
+        console.log("Ethereum object doesn't exist")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const connectWallet = async () => {
     try {
@@ -83,7 +116,7 @@ function App() {
 
         //execute actual wave
 
-        const waveTxn = await wavePortalContract.wave()
+        const waveTxn = await wavePortalContract.wave("HARDCODE")
         console.log("Mining...", waveTxn.hash)
 
         await waveTxn.wait()
@@ -91,6 +124,8 @@ function App() {
 
         count = await wavePortalContract.getTotalWaves()
         console.log("total wave count...", count.toNumber())
+        getAllWaves()
+        
       } else {
         console.log('ethereum object does not exist on window')
       }
@@ -110,6 +145,15 @@ function App() {
         </div>
         <button className="waveButton" onClick={wave}>Wave at me</button>
         <button className="waveButton" onClick={connectWallet}>{currentAccount ? 'Wallet Connected!': 'Connect Wallet'}</button>
+
+        {allWaves.map((wave, index) => {
+          return (
+            <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
+              <div>Address: {wave.address}</div>
+              <div>Time: {wave.timestamp.toString()}</div>
+              <div>Message: {wave.message}</div>
+            </div>)
+        })}
       </div>
 
 
