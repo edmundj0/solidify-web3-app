@@ -1,13 +1,11 @@
-# Sample Hardhat Project
+# Send me a message!
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
+This project is a decentralized messaging application hosted on Ethereum testnet. Come say hi to me!
 
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
+npm install
+cd react-app
+npm install
 ```
+
+Navigate to localhost:3000
